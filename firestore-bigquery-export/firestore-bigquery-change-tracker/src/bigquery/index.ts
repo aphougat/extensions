@@ -265,7 +265,7 @@ export class FirestoreBigQueryEventHistoryTracker
     const dataset = this.bigqueryDataset();
     const view = dataset.table(this.rawLatestView());
     const [viewExists] = await view.exists();
-
+    const projectId = await this.bq.getProjectId().trim;
     if (viewExists) {
       logs.bigQueryViewAlreadyExists(view.id, dataset.id);
       const [metadata] = await view.getMetadata();
@@ -277,6 +277,7 @@ export class FirestoreBigQueryEventHistoryTracker
 
       if (!documentIdColExists) {
         metadata.view = latestConsistentSnapshotView(
+            projectId,
           this.config.datasetId,
           this.rawChangeLogTableName()
         );
@@ -286,6 +287,7 @@ export class FirestoreBigQueryEventHistoryTracker
       }
     } else {
       const latestSnapshot = latestConsistentSnapshotView(
+          projectId,
         this.config.datasetId,
         this.rawChangeLogTableName()
       );

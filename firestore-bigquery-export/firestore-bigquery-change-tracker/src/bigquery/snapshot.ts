@@ -21,10 +21,12 @@ import { RawChangelogViewSchema, timestampField } from "./schema";
 const excludeFields: string[] = ["document_name", "document_id"];
 
 export const latestConsistentSnapshotView = (
+    projectId: string,
   datasetId: string,
   tableName: string
 ) => ({
   query: buildLatestSnapshotViewQuery(
+      projectId,
     datasetId,
     tableName,
     timestampField.name,
@@ -36,6 +38,7 @@ export const latestConsistentSnapshotView = (
 });
 
 export function buildLatestSnapshotViewQuery(
+    projectId: string,
   datasetId: string,
   tableName: string,
   timestampColumnName: string,
@@ -75,7 +78,7 @@ export function buildLatestSnapshotViewQuery(
         FIRST_VALUE(operation)
           OVER(PARTITION BY document_name ORDER BY ${timestampColumnName} DESC) = "DELETE"
           AS is_deleted
-      FROM \`${process.env.PROJECT_ID}.${datasetId}.${tableName}\`
+      FROM \`${projectId}.${datasetId}.${tableName}\`
       ORDER BY document_name, ${timestampColumnName} DESC
     )
     WHERE NOT is_deleted
